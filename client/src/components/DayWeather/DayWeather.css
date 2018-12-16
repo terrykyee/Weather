@@ -1,0 +1,26 @@
+.dayWeather {
+  font-family: 'Open Sans', sans-serif;
+  flex: none;
+  display: block;
+  height: 100%;
+  margin: 20px;
+}
+
+.day,
+.smallDescription {
+  font-size: 16px;
+  color: steelblue;
+  letter-spacing: 0.05em;
+  font-weight: 900;
+  margin: 2px;
+  text-align: center;
+  font-style: italic;
+}
+
+.smallDescription {
+  font-size: 14px;
+  color: gray;
+  margin-bottom: 5px;
+  text-align: center;
+  font-style: normal;
+}

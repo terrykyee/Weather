@@ -1,0 +1,25 @@
+.weatherContainer {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 100%;
+}
+
+.weatherPane {
+  display: flex;
+  flex-flow: column;
+  align-items: stretch;
+  margin: 0 auto;
+  width: 200px;
+  height: 100%;
+  min-height: 100%;
+}
+
+.forecastPane {
+  width: 100%;
+}
+
+.tempChart {
+  margin: 0 auto;
+  width: 600px;
+}

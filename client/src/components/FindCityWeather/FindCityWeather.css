@@ -1,0 +1,53 @@
+.main {
+  font-family: Verdana;
+}
+
+.inputField {
+  display: flex;
+  flex-direction: row;
+  margin: 7px;
+  align-content: space-between;
+}
+
+.input {
+  width: 250px;
+}
+
+.label {
+  font-size: small;
+  font-weight: bold;
+  margin-right: 35px;
+  margin-top: 2px;
+}
+
+.findButtonPane {
+  display: flex;
+  margin-top: 15px;
+}
+
+
+.findButton {
+  flex-grow: 1;
+  font-weight: bold;
+  color: white;
+  border: none;
+  background: royalblue;
+  font-size: 15px;
+  height: 25px;
+  margin: 0 120px;
+  margin-bottom: 5px;
+}
+
+.findButton:focus {
+  outline: none;
+}
+
+.findButton:active {
+  background: indianred;
+}
+
+.error {
+  color: red;
+  margin-top: 5px;
+  font-size: 12px;
+}

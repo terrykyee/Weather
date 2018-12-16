@@ -1,0 +1,30 @@
+.currentWeather {
+  font-family: 'Open Sans', sans-serif;
+  flex: none;
+  display: block;
+  height: 100%;
+}
+
+.cityName,
+.description {
+  font-size: 20px;
+  color: #000000;
+  letter-spacing: 0.05em;
+  font-weight: 900;
+  margin: 5px;
+  text-align: center;
+  font-style: italic;
+}
+
+.description,
+.smallDescription {
+  font-size: 16px;
+  color: gray;
+  margin-bottom: 5px;
+  font-style: normal;
+}
+
+.smallDescription {
+  font-size: 14px;
+  text-align: center;
+}
