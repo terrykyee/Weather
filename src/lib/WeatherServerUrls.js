@@ -5,11 +5,12 @@ import urljoin from 'url-join';
 export const Paths = {
   FIVE_DAY_FORECAST: '/data/2.5/forecast',
   CURRENT_WEATHER: '/data/2.5/weather',
+  SIXTEEN_DAY_FORECAST: '/data/2.5/forecast/daily',
 };
 
 export const HOST_NAME = 'api.openweathermap.org';
 
-export const ICON_URL = 'http://openweathermap.org/img/w/';
+export const ICON_URL = 'https://openweathermap.org/img/w/';
 
 /**
  * Represents a protocol and its characteristics.
@@ -80,6 +81,17 @@ export class WeatherServerUrls {
     const params = WeatherServerUrls.createQueryString({q: city, APPID: process.env.REACT_APP_API_KEY});
     return urljoin(WeatherServerUrls.getServerOrigin(WebProtocols.https),
       `${Paths.CURRENT_WEATHER}?${params}`);
+  }
+
+  /**
+   * Gets the endpoint to retrieve 5-day forecast for a city
+   * @param city City name
+   * @return {string} URL to the weather server to retrieve 5-day forecast
+   */
+  static longForecast(city: string): string {
+    const params = WeatherServerUrls.createQueryString({q: city, APPID: process.env.REACT_APP_API_KEY});
+    return urljoin(WeatherServerUrls.getServerOrigin(WebProtocols.https),
+      `${Paths.SIXTEEN_DAY_FORECAST}?${params}`);
   }
 
   /**

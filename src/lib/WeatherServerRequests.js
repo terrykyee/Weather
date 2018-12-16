@@ -31,4 +31,9 @@ export class WeatherServerRequests {
     const url = WeatherServerUrls.currentWeather(city);
     return WeatherServerRequests.request(url);
   }
+
+  static longForecast(city: string): Promise<*> {
+    const url = WeatherServerUrls.longForecast(city);
+    return WeatherServerRequests.request(url);
+  }
 }
