@@ -14,7 +14,8 @@ import {
 } from "../../lib/NetworkUtilities";
 import CurrentWeather from '../CurrentWeather/CurrentWeather';
 import Forecast from '../Forecast/Forecast';
-import { convertKelvinToCelsius } from '../../lib/UnitUtilities';
+import { convertKelvinToCelsius, formatDate } from '../../lib/UnitUtilities';
+import { WeatherInfoDisplayConstants } from '../../lib/DisplayConstants';
 // Flow type definitions for injected props
 type WeatherInfoInjectedPropsType = {
   match: any,
@@ -37,8 +38,10 @@ type WeatherInfoPropsType = WeatherInfoInjectedPropsType &
 type WeatherInfoStateType = {
   isFetching: boolean,
   error: string,
-  currentWeatherData: ?any,
-  forecastData: ?any,
+  currentWeatherData: any,
+  forecastData: any,
+  showRange: boolean,
+  averageTemp: number,
 }
 
 const ErrorMessages = {
@@ -66,8 +69,10 @@ class WeatherInfoComponent extends
     this.state = {
       isFetching: true,
       error: '',
-      currentWeatherData: null,
-      forecastData: null,
+      currentWeatherData: {},
+      forecastData: {},
+      showRange: false,
+      averageTemp: 0,
     }
   }
 
@@ -76,8 +81,8 @@ class WeatherInfoComponent extends
 
   async componentDidMount() {
     const {city} = this.props.match.params;
-    let currentWeatherData;
-    let forecastData;
+    let currentWeatherData = {};
+    let forecastData = {};
 
     await this.sendRequest(async () => {
       currentWeatherData = await WeatherServerRequests.currentWeather(city);
@@ -87,10 +92,13 @@ class WeatherInfoComponent extends
       forecastData = await WeatherServerRequests.forecast(city);
     });
 
+    const averageTemp = WeatherInfoComponent.findTempAverage(forecastData);
+    console.log(averageTemp);
     this.setState({
       currentWeatherData,
       forecastData,
       isFetching: false,
+      averageTemp,
     });
   }
 
@@ -135,21 +143,75 @@ class WeatherInfoComponent extends
    */
   generatTempData(forecastData: any): any {
     let arr = [];
+
+    if (forecastData && forecastData.list && forecastData.list.length > 0) {
+      arr.push(this.generateChartData(forecastData, 'temp'));
+
+      if (this.state.showRange) {
+        arr.push(this.generateChartData(forecastData, 'temp_min'));
+        arr.push(this.generateChartData(forecastData, 'temp_max'));
+      }
+    }
+
+
+
+    return arr;
+  }
+
+  /**
+   * Helper function to generate chart temperature data
+   * @param forecastData 5-day forecast data
+   * @param tempPropertyName Forecast data temperature property name to extract
+   * @returns {Array} Array of chart compatible data
+   */
+  generateChartData(forecastData: any, tempPropertyName: string) {
     let tempData = [];
 
-    forecastData.list.map(day =>{
-      let date = new Date(day.dt * 1000);
-      let dateString =
-        `${date.getDate()}-${date.getMonth()}-${date.getFullYear()} ${date.getHours()}:${date.getMinutes()}`;
+    forecastData.list.map(day => {
+      let dateString = formatDate(day.dt);
       tempData.push({
         x: dateString,
-        y: convertKelvinToCelsius(day.main.temp),
+        y: convertKelvinToCelsius(day.main[tempPropertyName]),
       })
     });
 
-    arr.push(tempData);
-    return arr;
+    return tempData;
   }
+
+  /**
+   * Find the average temperature from a 5-day forecast
+   * @param forecastData 5-day forecast data
+   * @returns {number} Average temperature over the 5 days of data
+   */
+  static findTempAverage(forecastData: any): number {
+    if (forecastData && forecastData.list && forecastData.list.length > 0) {
+      return forecastData.list.reduce((sum, day) => {
+        return sum + convertKelvinToCelsius(day.main.temp);
+      }, 0) / forecastData.list.length;
+    }
+
+    return 1;
+  }
+
+  /**
+   * Show temperature range button clicked event handler.
+   * @param event {SyntheticMouseEvent} Mouse click event.
+   */
+  tempRangeHandler = (event: SyntheticMouseEvent<*>) => {
+    this.setState({
+      showRange: !this.state.showRange,
+    })
+  };
+
+  /**
+   * Validate user entered data
+   * @param props React properties
+   * @param state React state
+   * @returns {boolean} True if all fields are valid, otherwise false
+   */
+  userDataValid = (props: WeatherInfoPropsType, state: WeatherInfoStateType): boolean => {
+    return state.forecastData && state.forecastData.list && state.forecastData.list.length > 0;
+  };
 
   /**
    * Render this React component.
@@ -168,6 +230,12 @@ class WeatherInfoComponent extends
       );
     }
 
+    let tempColorName = 'midnightblue';
+
+    if (this.state.averageTemp > 0) {
+      tempColorName = 'darkgoldenrod'
+    }
+
     return (
       <div className="weatherContainer">
         <div className="weatherPane">
@@ -180,13 +248,21 @@ class WeatherInfoComponent extends
             xType={'time'}
             datePattern={'%d-%m-%Y %H:%M'}
             axes
-            width={600}
-            height={250}
-            lineColors={['darkgoldenrod']}
+            width={700}
+            height={200}
+            lineColors={[tempColorName, 'steelblue', 'indianred']}
             interpolate={'cardinal'}
             data={this.generatTempData(this.state.forecastData)}
           />
         </div>
+        <button
+          className="rangeButton"
+          onClick={this.tempRangeHandler}
+          disabled={!this.userDataValid(this.props, this.state)}
+        >
+          {this.state.showRange ? WeatherInfoDisplayConstants.TEMP_RANGE_OFF :
+          WeatherInfoDisplayConstants.TEMP_RANGE}
+        </button>
         <div className="forecastPane">
           <Forecast
             forecastData={this.state.forecastData}

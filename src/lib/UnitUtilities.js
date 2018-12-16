@@ -19,3 +19,8 @@ export function degToCompass(deg: number): string {
   const arr = ["N", "NNE", "NE", "ENE", "E", "ESE", "SE", "SSE", "S", "SSW", "SW", "WSW", "W", "WNW", "NW", "NNW"];
   return arr[(val % 16)];
 }
+
+export function formatDate(timestamp: number): string {
+  let date = new Date(timestamp * 1000);
+  return `${date.getDate()}-${date.getMonth()}-${date.getFullYear()} ${date.getHours()}:${date.getMinutes()}`;
+}

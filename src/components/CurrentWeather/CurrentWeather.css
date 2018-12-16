@@ -1,8 +1,6 @@
 .currentWeather {
   font-family: 'Open Sans', sans-serif;
-  flex: none;
   display: block;
-  height: 100%;
 }
 
 .cityName,

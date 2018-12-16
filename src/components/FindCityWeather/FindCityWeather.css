@@ -43,7 +43,7 @@
 }
 
 .findButton:active {
-  background: indianred;
+  background: gray;
 }
 
 .error {

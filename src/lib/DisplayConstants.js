@@ -29,3 +29,8 @@ export const MatchDisplayConstants = {
   TOTAL_CREEP_SCORE: 'CS',
   TCS_PER_MIN: 'CS/min',
 };
+
+export const WeatherInfoDisplayConstants = {
+  TEMP_RANGE: 'Temperature Range',
+  TEMP_RANGE_OFF: 'Temperature Range Off',
+};
