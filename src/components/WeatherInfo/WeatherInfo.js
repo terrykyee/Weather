@@ -45,7 +45,7 @@ type WeatherInfoStateType = {
 }
 
 const ErrorMessages = {
-  NOT_FOUND_MESSAGE: 'Current weather was not found',
+  NOT_FOUND_MESSAGE: 'Weather information was not found for this city',
   UNAUTHENTICATED_MESSAGE: 'You are not authorized to retrieve weather information',
   SERVER_FAILED: 'Open Weather servers are currently offline, please try again later',
 };
