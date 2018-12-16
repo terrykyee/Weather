@@ -14,7 +14,7 @@ import {
 } from "../../lib/NetworkUtilities";
 import CurrentWeather from '../CurrentWeather/CurrentWeather';
 import Forecast from '../Forecast/Forecast';
-import { convertKelvinToCelsius, formatDate } from '../../lib/UnitUtilities';
+import { convertKelvinToCelsius } from '../../lib/UnitUtilities';
 import { WeatherInfoDisplayConstants } from '../../lib/DisplayConstants';
 // Flow type definitions for injected props
 type WeatherInfoInjectedPropsType = {
@@ -168,9 +168,8 @@ class WeatherInfoComponent extends
     let tempData = [];
 
     forecastData.list.map(day => {
-      let dateString = formatDate(day.dt);
       tempData.push({
-        x: dateString,
+        x: day.dt_txt,
         y: convertKelvinToCelsius(day.main[tempPropertyName]),
       })
     });
@@ -246,7 +245,7 @@ class WeatherInfoComponent extends
         <div className="tempChart">
           <LineChart
             xType={'time'}
-            datePattern={'%d-%m-%Y %H:%M'}
+            datePattern={'%Y-%m-%d %H:%M:%S'}
             axes
             width={700}
             height={200}
