@@ -9,9 +9,9 @@ import './CurrentWeather.css';
 import { CurrentWeatherDisplayConstants } from '../../lib/DisplayConstants';
 import { ICON_URL } from '../../lib/WeatherServerUrls';
 import {
-  convertKelvinToCelsius,
-  degToCompass,
-  metersPerSecondToKmPerHour
+  convertKelvinToCelsius, convertKelvinToFahrenheit,
+  degToCompass, heatIndex,
+  metersPerSecondToKmPerHour, windChill
 } from '../../lib/UnitUtilities';
 import { capitalizeFirstLetter } from '../../lib/StringUtilities';
 
@@ -71,8 +71,14 @@ class CurrentWeatherComponent extends
       return (
         <div className="currentWeather">
           <div className="cityName">
-            {this.props.currentWeatherData.name} :&nbsp;
+            {this.props.currentWeatherData.name}&nbsp;
             {convertKelvinToCelsius(this.props.currentWeatherData.main.temp).toFixed(0)}
+            {CurrentWeatherDisplayConstants.TEMP_UNIT}
+          </div>
+          <div className="description">
+            {CurrentWeatherDisplayConstants.FEELS_LIKE_LABEL}&nbsp;
+            {heatIndex(convertKelvinToFahrenheit(this.props.currentWeatherData.main.temp),
+            this.props.currentWeatherData.main.humidity/100).toFixed(0)}
             {CurrentWeatherDisplayConstants.TEMP_UNIT}
           </div>
           <center><img src={`${ICON_URL}${this.props.currentWeatherData.weather[0].icon}.png`} alt='Profile Icon'
@@ -92,8 +98,11 @@ class CurrentWeatherComponent extends
             {CurrentWeatherDisplayConstants.WIND_LABEL}:&nbsp;
             {metersPerSecondToKmPerHour(this.props.currentWeatherData.wind.speed).toFixed(2)}
             {CurrentWeatherDisplayConstants.VELOCITY_UNIT},&nbsp;
-            {degToCompass(this.props.currentWeatherData.wind.deg)}
-
+            {degToCompass(this.props.currentWeatherData.wind.deg)}&nbsp;
+            {CurrentWeatherDisplayConstants.WIND_CHILL}:&nbsp;
+            {windChill(convertKelvinToCelsius(this.props.currentWeatherData.main.temp),
+              metersPerSecondToKmPerHour(this.props.currentWeatherData.wind.speed)).toFixed(0)}
+            {CurrentWeatherDisplayConstants.TEMP_UNIT}
           </div>
         </div>
       );

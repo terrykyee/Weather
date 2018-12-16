@@ -19,6 +19,8 @@ export const CurrentWeatherDisplayConstants = {
   WIND_LABEL: 'Wind',
   VELOCITY_UNIT: 'km/h',
   TEMP_UNIT: '°C',
+  FEELS_LIKE_LABEL: 'Feels like',
+  WIND_CHILL: 'Wind Chill',
 };
 
 export const MatchDisplayConstants = {

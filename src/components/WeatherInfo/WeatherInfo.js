@@ -93,7 +93,7 @@ class WeatherInfoComponent extends
     });
 
     const averageTemp = WeatherInfoComponent.findTempAverage(forecastData);
-    console.log(averageTemp);
+
     this.setState({
       currentWeatherData,
       forecastData,
