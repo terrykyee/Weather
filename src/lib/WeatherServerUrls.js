@@ -25,6 +25,10 @@ export const WebProtocols = {
     protocol: 'http',
     port: null,
   },
+  https: {
+    protocol: 'https',
+    port: null,
+  },
 };
 
 /**
@@ -63,7 +67,7 @@ export class WeatherServerUrls {
    */
   static forecast(city: string): string {
     const params = WeatherServerUrls.createQueryString({q: city, APPID: process.env.REACT_APP_API_KEY});
-    return urljoin(WeatherServerUrls.getServerOrigin(WebProtocols.http),
+    return urljoin(WeatherServerUrls.getServerOrigin(WebProtocols.https),
       `${Paths.FIVE_DAY_FORECAST}?${params}`);
   }
 
@@ -74,7 +78,7 @@ export class WeatherServerUrls {
    */
   static currentWeather(city: string): string {
     const params = WeatherServerUrls.createQueryString({q: city, APPID: process.env.REACT_APP_API_KEY});
-    return urljoin(WeatherServerUrls.getServerOrigin(WebProtocols.http),
+    return urljoin(WeatherServerUrls.getServerOrigin(WebProtocols.https),
       `${Paths.CURRENT_WEATHER}?${params}`);
   }
 
