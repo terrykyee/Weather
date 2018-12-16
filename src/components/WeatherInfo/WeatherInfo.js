@@ -167,7 +167,7 @@ class WeatherInfoComponent extends
   generateChartData(forecastData: any, tempPropertyName: string) {
     let tempData = [];
 
-    forecastData.list.map(day => {
+    forecastData.list.forEach(day => {
       tempData.push({
         x: day.dt_txt,
         y: convertKelvinToCelsius(day.main[tempPropertyName]),

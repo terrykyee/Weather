@@ -62,7 +62,7 @@ class ForecastComponent extends
    */
   getDailyForecastsOnly(forecastData: any): Array<Object> {
     let dailyForecastData = [];
-    forecastData.list.map(day => {
+    forecastData.list.forEach(day => {
       if (day.dt_txt.includes('12:00:00')) {
         dailyForecastData.push(day);
       }
