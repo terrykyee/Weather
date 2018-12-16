@@ -5,7 +5,6 @@ A barebones weather display showing showing current weather and a summarized 5-d
 ## Running the Client
 ```bash
 # Start the server (default port 3000)
-cd client
 npm install
 npm run start
 ```
