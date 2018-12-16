@@ -56,7 +56,7 @@ class App extends React.Component<AppPropsType, AppStateType> {
           <div className="App-title">
             <div className="App-icon">
             </div>
-            <h1>Open Weather</h1>
+            <h1>Open Weather Map</h1>
           </div>
           <div className="search">
             <FindCityWeather />

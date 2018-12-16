@@ -1,0 +1,6 @@
+/**
+ * See https://rma-consulting.github.io/react-easy-chart/
+ */
+declare module 'react-easy-chart' {
+  declare module.exports: any;
+}

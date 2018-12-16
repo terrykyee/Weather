@@ -10,7 +10,7 @@ import DayWeather from '../DayWeather/DayWeather';
 
 // Flow type definitions for injected props
 type ForecastInjectedPropsType = {
-  matches: any,
+  forecastData: any,
 }
 
 // Flow type definitions for connected props
@@ -36,7 +36,7 @@ type ForecastStateType = {
 class ForecastComponent extends
   React.PureComponent<ForecastPropsType, ForecastStateType> {
   static propTypes = {
-    forecastData: PropTypes.object, // TODO create matching types to flow types and use shape here,
+    forecastData: PropTypes.object.isRequired, // TODO create matching types to flow types and use shape here,
   };
 
   static defaultProps = {};
@@ -92,10 +92,10 @@ class ForecastComponent extends
    * @returns {XML}
    */
   render(): React.Node {
-    const matches = this.generateForecast();
+    const dailyWeather = this.generateForecast();
     return (
-      <div className="matches">
-        {matches}
+      <div className="daily">
+        {dailyWeather}
       </div>
     );
   }
