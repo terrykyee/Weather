@@ -32,11 +32,11 @@
     "prop-types": "^15.6.1",
     "react": "^16.3.2",
     "react-dom": "^16.3.2",
-    "react-easy-chart": "^1.0.0",
     "react-inputs-validation": "^1.0.0",
     "react-router": "^4.3.1",
     "react-router-dom": "^4.3.1",
     "react-scripts": "1.1.4",
+    "recharts": "^1.4.2",
     "sass-loader": "^7.0.1",
     "url-join": "^4.0.0"
   },

@@ -7,7 +7,9 @@ import * as React from 'react';
 import PropTypes from 'prop-types';
 import moment from 'moment-timezone';
 import cityTimezones from 'city-timezones';
-import { LineChart } from 'react-easy-chart';
+import {
+  LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip
+} from 'recharts';
 import './WeatherInfo.css';
 import { WeatherServerRequests } from '../../lib/WeatherServerRequests';
 import {
@@ -17,7 +19,6 @@ import {
 import CurrentWeather from '../CurrentWeather/CurrentWeather';
 import Forecast from '../Forecast/Forecast';
 import { convertKelvinToCelsius } from '../../lib/UnitUtilities';
-import { WeatherInfoDisplayConstants } from '../../lib/DisplayConstants';
 
 // Flow type definitions for injected props
 type WeatherInfoInjectedPropsType = {
@@ -43,7 +44,6 @@ type WeatherInfoStateType = {
   error: string,
   currentWeatherData: any,
   forecastData: any,
-  showRange: boolean,
   averageTemp: number,
 }
 
@@ -55,7 +55,7 @@ const ErrorMessages = {
 
 type ApiRequestFunctionType = (arg: any) => Promise<*>;
 
-const DATE_TIME_FORMAT: string = '%Y-%m-%d %H:%M:%S';
+const DATE_TIME_FORMAT: string = 'h:mma ddd';
 const MOMENT_DATE_TIME_FORMAT: string = 'YYYY-MM-DD HH:mm:ss';
 
 /**
@@ -77,7 +77,6 @@ class WeatherInfoComponent extends
       error: '',
       currentWeatherData: {},
       forecastData: {},
-      showRange: false,
       averageTemp: 0,
     }
   }
@@ -172,19 +171,12 @@ class WeatherInfoComponent extends
    * @param forecastData 5-day forecast data
    * @returns {Array} Array of xy (time, temp) data for LineChart
    */
-  generatTempData(forecastData: any): any {
+  generateTempData(forecastData: any): any {
     let arr = [];
 
     if (forecastData && forecastData.list && forecastData.list.length > 0) {
-      arr.push(this.generateChartData(forecastData, 'temp'));
-
-      if (this.state.showRange) {
-        arr.push(this.generateChartData(forecastData, 'temp_min'));
-        arr.push(this.generateChartData(forecastData, 'temp_max'));
-      }
+      return this.generateChartData(forecastData, 'temp');
     }
-
-
 
     return arr;
   }
@@ -200,8 +192,8 @@ class WeatherInfoComponent extends
 
     forecastData.list.forEach(day => {
       tempData.push({
-        x: day.dt_txt,
-        y: convertKelvinToCelsius(day.main[tempPropertyName]),
+        x: moment(day.dt*1000).format(DATE_TIME_FORMAT),
+        temp: convertKelvinToCelsius(day.main[tempPropertyName]).toFixed(0),
       })
     });
 
@@ -222,26 +214,6 @@ class WeatherInfoComponent extends
 
     return 1;
   }
-
-  /**
-   * Show temperature range button clicked event handler.
-   * @param event {SyntheticMouseEvent} Mouse click event.
-   */
-  tempRangeHandler = (event: SyntheticMouseEvent<*>) => {
-    this.setState({
-      showRange: !this.state.showRange,
-    })
-  };
-
-  /**
-   * Validate user entered data
-   * @param props React properties
-   * @param state React state
-   * @returns {boolean} True if all fields are valid, otherwise false
-   */
-  userDataValid = (props: WeatherInfoPropsType, state: WeatherInfoStateType): boolean => {
-    return state.forecastData && state.forecastData.list && state.forecastData.list.length > 0;
-  };
 
   /**
    * Render this React component.
@@ -275,24 +247,21 @@ class WeatherInfoComponent extends
         </div>
         <div className="tempChart">
           <LineChart
-            xType={'time'}
-            datePattern={DATE_TIME_FORMAT}
-            axes
             width={700}
             height={200}
-            lineColors={[tempColorName, 'steelblue', 'indianred']}
-            interpolate={'cardinal'}
-            data={this.generatTempData(this.state.forecastData)}
-          />
+            data={this.generateTempData(this.state.forecastData)}
+          >
+            <XAxis
+              dataKey="x"
+              domain={['auto', 'auto']}
+              name="Time"
+            />
+            <CartesianGrid strokeDasharray="3 3"/>
+            <YAxis />
+            <Tooltip/>
+            <Line type="monotone" dataKey="temp" stroke={tempColorName} activeDot={{r: 8}}/>
+          </LineChart>
         </div>
-        <button
-          className="rangeButton"
-          onClick={this.tempRangeHandler}
-          disabled={!this.userDataValid(this.props, this.state)}
-        >
-          {this.state.showRange ? WeatherInfoDisplayConstants.TEMP_RANGE_OFF :
-          WeatherInfoDisplayConstants.TEMP_RANGE}
-        </button>
         <div className="forecastPane">
           <Forecast
             forecastData={this.state.forecastData}
