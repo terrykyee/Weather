@@ -35,12 +35,13 @@ export function formatDate(timestamp: number): string {
 
 /**
  * Feels like (heat index) temperature
- * @param temp Temperature in F
+ * @param temperature Temperature in K
  * @param relHumidity Relative humidity
  * @returns {number} Feels like temperature in C
  */
-export function heatIndex(temp: number, relHumidity: number): number {
+export function heatIndex(temperature: number, relHumidity: number): number {
   let heatIndex;
+  const temp = convertKelvinToFahrenheit(temperature);
 
   if (temp < 80) {
     heatIndex = 0.5 * (temp + 61.0 + ((temp - 68.0) * 1.2) + (relHumidity * 0.094));

@@ -5,8 +5,10 @@
  */
 import * as React from 'react';
 import PropTypes from 'prop-types';
+import moment from 'moment-timezone';
 import './Forecast.css';
 import DayWeather from '../DayWeather/DayWeather';
+import { convertKelvinToCelsius } from '../../lib/UnitUtilities';
 
 // Flow type definitions for injected props
 type ForecastInjectedPropsType = {
@@ -62,13 +64,53 @@ class ForecastComponent extends
    */
   getDailyForecastsOnly(forecastData: any): Array<Object> {
     let dailyForecastData = [];
-    forecastData.list.forEach(day => {
-      if (day.dt_txt.includes('12:00:00')) {
-        dailyForecastData.push(day);
+    const sortedForecast = this.sortByDay(forecastData);
+
+    // find the closest entry to noon for the day
+    // also rewrite min/max temps with proper high low temps
+    Object.keys(sortedForecast).forEach(key => {
+      const day = sortedForecast[key];
+      let minHoursFromNoon = Number.MAX_VALUE;
+      let foundIndex = 0;
+
+      for (let i = 0; i < day.data.length; i++) {
+        let hoursFromNoon = moment(day.data[i].dt).format('HH');
+        hoursFromNoon = Math.abs(hoursFromNoon - 12);
+
+        if (hoursFromNoon < minHoursFromNoon) {
+          foundIndex = i;
+          minHoursFromNoon = hoursFromNoon;
+        }
       }
+
+      day.data[foundIndex].main.temp_min = day.minTemp;
+      day.data[foundIndex].main.temp_max = day.maxTemp;
+      dailyForecastData.push(day.data[foundIndex]);
     });
 
     return dailyForecastData;
+  }
+
+  sortByDay(forecastData: any): Object {
+    const fiveDayForecast = {};
+
+    forecastData.list.forEach(entry =>{
+      const day = moment(entry.dt * 1000).format('DD');
+      if (!fiveDayForecast[day]) {
+        fiveDayForecast[day] = {
+          data: [],
+          maxTemp: -Number.MAX_VALUE,
+          minTemp: Number.MAX_VALUE,
+        };
+      }
+
+      const dayForecast = fiveDayForecast[day];
+      dayForecast.data.push(entry);
+      dayForecast.maxTemp = Math.max(dayForecast.maxTemp, convertKelvinToCelsius(entry.main.temp));
+      dayForecast.minTemp = Math.min(dayForecast.minTemp, convertKelvinToCelsius(entry.main.temp));
+    });
+
+    return fiveDayForecast;
   }
 
   /**

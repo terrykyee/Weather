@@ -17,10 +17,16 @@
   font-style: italic;
 }
 
-.smallDescription {
+.smallDescription,
+.smallerDescription {
   font-size: 14px;
   color: gray;
   margin-bottom: 5px;
   text-align: center;
   font-style: normal;
+}
+
+.smallerDescription {
+  font-size: 10px;
+  color: black;
 }

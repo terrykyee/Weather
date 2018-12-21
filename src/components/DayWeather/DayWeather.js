@@ -8,9 +8,7 @@ import PropTypes from 'prop-types';
 import './DayWeather.css';
 import { CurrentWeatherDisplayConstants } from '../../lib/DisplayConstants';
 import { ICON_URL } from '../../lib/WeatherServerUrls';
-import {
-  convertKelvinToCelsius,
-} from '../../lib/UnitUtilities';
+import { capitalizeFirstLetter } from '../../lib/StringUtilities';
 
 // Flow type definitions for injected props
 type DayWeatherInjectedPropsType = {
@@ -58,6 +56,7 @@ class DayWeatherComponent extends
   props: DayWeatherPropsType;
 
   componentDidMount() {
+    console.log('DayWeather');
     console.log(this.props.weatherData);
   }
 
@@ -84,10 +83,13 @@ class DayWeatherComponent extends
           </div>
           <center><img src={`${ICON_URL}${this.props.weatherData.weather[0].icon}.png`} alt='Profile Icon'
                        className='profileIcon'/></center>
+          <div className="smallerDescription">
+            {capitalizeFirstLetter(this.props.weatherData.weather[0].description)}
+          </div>
           <div className="smallDescription">
-            {convertKelvinToCelsius(this.props.weatherData.main.temp_max).toFixed(0)}
+            {this.props.weatherData.main.temp_max.toFixed(0)}
             {CurrentWeatherDisplayConstants.TEMP_UNIT}&nbsp;
-            {convertKelvinToCelsius(this.props.weatherData.main.temp_min).toFixed(0)}
+            {this.props.weatherData.main.temp_min.toFixed(0)}
             {CurrentWeatherDisplayConstants.TEMP_UNIT}
           </div>
         </div>

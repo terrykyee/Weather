@@ -3,6 +3,8 @@
  * @file Main application
  */
 import React from 'react';
+import jstz from 'jstz';
+import moment from 'moment-timezone';
 import './App.css';
 import FindCityWeather from './components/FindCityWeather/FindCityWeather';
 
@@ -44,6 +46,16 @@ class App extends React.Component<AppPropsType, AppStateType> {
 
   state: AppStateType;
   props: AppPropsType;
+
+  componentDidMount() {
+    App.setTimeZone();
+  }
+
+  static setTimeZone() {
+    const timezone = jstz.determine();
+    console.log(`Local timezone: ${timezone.name()}`);
+    moment.tz.setDefault(timezone.name());
+  }
 
   /**
    * Render this React component.

@@ -9,7 +9,7 @@ import './CurrentWeather.css';
 import { CurrentWeatherDisplayConstants } from '../../lib/DisplayConstants';
 import { ICON_URL } from '../../lib/WeatherServerUrls';
 import {
-  convertKelvinToCelsius, convertKelvinToFahrenheit,
+  convertKelvinToCelsius,
   degToCompass, heatIndex,
   metersPerSecondToKmPerHour, windChill
 } from '../../lib/UnitUtilities';
@@ -77,7 +77,7 @@ class CurrentWeatherComponent extends
           </div>
           <div className="description">
             {CurrentWeatherDisplayConstants.FEELS_LIKE_LABEL}&nbsp;
-            {heatIndex(convertKelvinToFahrenheit(this.props.currentWeatherData.main.temp),
+            {heatIndex(this.props.currentWeatherData.main.temp,
             this.props.currentWeatherData.main.humidity/100).toFixed(0)}
             {CurrentWeatherDisplayConstants.TEMP_UNIT}
           </div>
@@ -96,9 +96,9 @@ class CurrentWeatherComponent extends
           </div>
           <div className="smallDescription">
             {CurrentWeatherDisplayConstants.WIND_LABEL}:&nbsp;
-            {metersPerSecondToKmPerHour(this.props.currentWeatherData.wind.speed).toFixed(2)}
+            {metersPerSecondToKmPerHour(this.props.currentWeatherData.wind.speed).toFixed(0)}
             {CurrentWeatherDisplayConstants.VELOCITY_UNIT},&nbsp;
-            {degToCompass(this.props.currentWeatherData.wind.deg)}&nbsp;
+            {degToCompass(this.props.currentWeatherData.wind.deg)}&nbsp;&nbsp;
             {CurrentWeatherDisplayConstants.WIND_CHILL}:&nbsp;
             {windChill(convertKelvinToCelsius(this.props.currentWeatherData.main.temp),
               metersPerSecondToKmPerHour(this.props.currentWeatherData.wind.speed)).toFixed(0)}

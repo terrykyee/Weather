@@ -5,6 +5,8 @@
  */
 import * as React from 'react';
 import PropTypes from 'prop-types';
+import moment from 'moment-timezone';
+import cityTimezones from 'city-timezones';
 import { LineChart } from 'react-easy-chart';
 import './WeatherInfo.css';
 import { WeatherServerRequests } from '../../lib/WeatherServerRequests';
@@ -16,6 +18,7 @@ import CurrentWeather from '../CurrentWeather/CurrentWeather';
 import Forecast from '../Forecast/Forecast';
 import { convertKelvinToCelsius } from '../../lib/UnitUtilities';
 import { WeatherInfoDisplayConstants } from '../../lib/DisplayConstants';
+
 // Flow type definitions for injected props
 type WeatherInfoInjectedPropsType = {
   match: any,
@@ -51,6 +54,9 @@ const ErrorMessages = {
 };
 
 type ApiRequestFunctionType = (arg: any) => Promise<*>;
+
+const DATE_TIME_FORMAT: string = '%Y-%m-%d %H:%M:%S';
+const MOMENT_DATE_TIME_FORMAT: string = 'YYYY-MM-DD HH:mm:ss';
 
 /**
  * Weather Info React Component class
@@ -92,6 +98,8 @@ class WeatherInfoComponent extends
       forecastData = await WeatherServerRequests.forecast(city);
     });
 
+    forecastData = this.adjustDataForTimezone(city, forecastData);
+
     const averageTemp = WeatherInfoComponent.findTempAverage(forecastData);
 
     this.setState({
@@ -100,6 +108,29 @@ class WeatherInfoComponent extends
       isFetching: false,
       averageTemp,
     });
+  }
+
+  /**
+   * Adjust date text data appropriate for that city's timezone if we can find it, otherwise
+   * use our local timezone
+   * @param cityName City name
+   * @param forecastData Forecast data from API
+   * @returns {any} Forecast data with modified dt_txt
+   */
+  adjustDataForTimezone(cityName: string, forecastData: any): any {
+    const cityLookup = cityTimezones.lookupViaCity(cityName);
+
+    if (cityLookup && cityLookup.length > 0) {
+      console.log(`Found timezone for ${cityName}: ${cityLookup[0].timezone}`);
+      moment.tz.setDefault(cityLookup[0].timezone);
+    } else {
+      console.log(`Could not find timezone for ${cityName}, sticking with local timezone`);
+    }
+
+    forecastData.list.forEach(entry => {
+      entry.dt_txt = moment(entry.dt*1000).format(MOMENT_DATE_TIME_FORMAT);
+    });
+    return forecastData;
   }
 
   /**
@@ -245,7 +276,7 @@ class WeatherInfoComponent extends
         <div className="tempChart">
           <LineChart
             xType={'time'}
-            datePattern={'%Y-%m-%d %H:%M:%S'}
+            datePattern={DATE_TIME_FORMAT}
             axes
             width={700}
             height={200}
