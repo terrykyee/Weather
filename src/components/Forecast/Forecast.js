@@ -8,10 +8,13 @@ import PropTypes from 'prop-types';
 import moment from 'moment-timezone';
 import './Forecast.css';
 import DayWeather from '../DayWeather/DayWeather';
+import TemperatureChart from '../TemperatureChart/TemperatureChart';
 import { convertKelvinToCelsius } from '../../lib/UnitUtilities';
+import { WeatherInfoDisplayConstants } from '../../lib/DisplayConstants';
 
 // Flow type definitions for injected props
 type ForecastInjectedPropsType = {
+  sortedForecastData: any,
   forecastData: any,
 }
 
@@ -30,7 +33,11 @@ type ForecastPropsType = ForecastInjectedPropsType &
  * The state declaration for the forecast state
  */
 type ForecastStateType = {
+  selectedDay: string,
+  showWeek: boolean,
 }
+
+const DATE_TIME_FORMAT: string = 'h:mma ddd';
 
 /**
  * Forecast React Component class
@@ -38,7 +45,8 @@ type ForecastStateType = {
 class ForecastComponent extends
   React.PureComponent<ForecastPropsType, ForecastStateType> {
   static propTypes = {
-    forecastData: PropTypes.object.isRequired, // TODO create matching types to flow types and use shape here,
+    sortedForecastData: PropTypes.object.isRequired, // TODO create matching types to flow types and use shape here,
+    forecastData: PropTypes.object.isRequired,
   };
 
   static defaultProps = {};
@@ -47,6 +55,8 @@ class ForecastComponent extends
     super(props);
 
     this.state = {
+      selectedDay: "",
+      showWeek: true,
     }
   }
 
@@ -54,17 +64,17 @@ class ForecastComponent extends
   props: ForecastPropsType;
 
   async componentDidMount() {
+    console.log(this.props.sortedForecastData);
     console.log(this.props.forecastData);
   }
 
   /**
    * Filters out daily 12pm forecasts from complete forecast data
-   * @param forecastData 5-day forecast data
+   * @param sortedForecast 5-day sorted forecast data
    * @returns {Array} Array of 12pm forecast data for each day
    */
-  getDailyForecastsOnly(forecastData: any): Array<Object> {
+  getDailyForecastsOnly(sortedForecast: any): Array<Object> {
     let dailyForecastData = [];
-    const sortedForecast = this.sortByDay(forecastData);
 
     // find the closest entry to noon for the day
     // also rewrite min/max temps with proper high low temps
@@ -91,43 +101,87 @@ class ForecastComponent extends
     return dailyForecastData;
   }
 
-  sortByDay(forecastData: any): Object {
-    const fiveDayForecast = {};
+  /**
+   * Generate temperature data from 5-day forecast data for LineChart
+   * @param forecastDataArray 5-day forecast data
+   * @returns {Array} Array of xy (time, temp) data for LineChart
+   */
+  generateTempData(forecastDataArray: any): any {
+    let arr = [];
 
-    forecastData.list.forEach(entry =>{
-      const day = moment(entry.dt * 1000).format('DD');
-      if (!fiveDayForecast[day]) {
-        fiveDayForecast[day] = {
-          data: [],
-          maxTemp: -Number.MAX_VALUE,
-          minTemp: Number.MAX_VALUE,
-        };
-      }
+    if (forecastDataArray && forecastDataArray.length > 0) {
+      return this.generateChartData(forecastDataArray, 'temp');
+    }
 
-      const dayForecast = fiveDayForecast[day];
-      dayForecast.data.push(entry);
-      dayForecast.maxTemp = Math.max(dayForecast.maxTemp, convertKelvinToCelsius(entry.main.temp));
-      dayForecast.minTemp = Math.min(dayForecast.minTemp, convertKelvinToCelsius(entry.main.temp));
+    return arr;
+  }
+
+  /**
+   * Helper function to generate chart temperature data
+   * @param forecastDataArray 5-day forecast data
+   * @param tempPropertyName Forecast data temperature property name to extract
+   * @returns {Array} Array of chart compatible data
+   */
+  generateChartData(forecastDataArray: any, tempPropertyName: string) {
+    let tempData = [];
+
+    forecastDataArray.forEach(day => {
+      tempData.push({
+        x: moment(day.dt*1000).format(DATE_TIME_FORMAT),
+        temp: convertKelvinToCelsius(day.main[tempPropertyName]).toFixed(0),
+      })
     });
 
-    return fiveDayForecast;
+    return tempData;
   }
+
+  OnDayClicked = (day: string) => {
+      this.setState({
+        selectedDay: day,
+        showWeek: false,
+      })
+  };
 
   /**
    * Generate JSX representing daily weather
    * @returns {Array} Array of React JSX representing daily weather
    */
   generateForecast() {
-    if (this.props.forecastData && this.props.forecastData.list &&
-      this.props.forecastData.list.length > 0) {
-      let dailyForecastData = this.getDailyForecastsOnly(this.props.forecastData);
+    if (this.props.sortedForecastData && Object.keys(this.props.sortedForecastData).length > 0) {
+      let dailyForecastData = this.getDailyForecastsOnly(this.props.sortedForecastData);
       return dailyForecastData.map( dayForecast => (
         <React.Fragment key={dayForecast.dt}>
-          <DayWeather weatherData={dayForecast} />
+          <DayWeather
+            weatherData={dayForecast}
+            selected={moment(dayForecast.dt*1000).format('DD') === this.state.selectedDay}
+            clickHandler={this.OnDayClicked}
+          />
         </React.Fragment>
       ));
     }
   }
+
+  /**
+   * Show week button clicked event handler.
+   * @param event {SyntheticMouseEvent} Mouse click event.
+   */
+  showWeekHandler = (event: SyntheticMouseEvent<*>) => {
+    this.setState({
+      showWeek: !this.state.showWeek,
+      selectedDay: '',
+    })
+  };
+
+  /**
+   * Validate user entered data
+   * @param props React properties
+   * @param state React state
+   * @returns {boolean} True if all fields are valid, otherwise false
+   */
+  userDataValid = (props: ForecastPropsType, state: ForecastStateType): boolean => {
+    return props.forecastData && props.forecastData.list &&
+      props.forecastData.list.length > 0 && state.selectedDay !== '';
+  };
 
   /**
    * Render this React component.
@@ -136,8 +190,20 @@ class ForecastComponent extends
   render(): React.Node {
     const dailyWeather = this.generateForecast();
     return (
-      <div className="daily">
-        {dailyWeather}
+      <div className="forecast">
+        <div className="chartPane">
+          <TemperatureChart data={this.generateTempData(this.state.showWeek ? this.props.forecastData.list : this.props.sortedForecastData[this.state.selectedDay].data)} />
+        </div>
+        <button
+          className="showButton"
+          onClick={this.showWeekHandler}
+          disabled={!this.userDataValid(this.props, this.state)}
+        >
+          {WeatherInfoDisplayConstants.SHOW_WEEK}
+        </button>
+        <div className="daily">
+          {dailyWeather}
+        </div>
       </div>
     );
   }

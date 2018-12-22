@@ -19,24 +19,6 @@
   width: 100%;
 }
 
-.tempChart {
-  margin: 0 auto;
-  width: auto;
-}
-
-.rangeButton {
-  flex-grow: 1;
-  font-weight: bold;
-  color: white;
-  border: none;
-  background: royalblue;
-  font-size: 15px;
-  height: 25px;
-  margin: 0 auto;
-  margin-bottom: 5px;
-  width: auto;
-}
-
 .rangeButton:focus {
   outline: none;
 }

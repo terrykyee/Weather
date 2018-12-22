@@ -1,9 +1,14 @@
-.dayWeather {
+.dayWeather,
+.dayWeatherSelected {
   font-family: 'Open Sans', sans-serif;
   flex: none;
   display: block;
   height: 100%;
   margin: 20px;
+}
+
+.dayWeatherSelected {
+  background-color: palegoldenrod;
 }
 
 .day,

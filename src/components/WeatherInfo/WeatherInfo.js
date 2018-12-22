@@ -7,9 +7,6 @@ import * as React from 'react';
 import PropTypes from 'prop-types';
 import moment from 'moment-timezone';
 import cityTimezones from 'city-timezones';
-import {
-  LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip
-} from 'recharts';
 import './WeatherInfo.css';
 import { WeatherServerRequests } from '../../lib/WeatherServerRequests';
 import {
@@ -44,7 +41,6 @@ type WeatherInfoStateType = {
   error: string,
   currentWeatherData: any,
   forecastData: any,
-  averageTemp: number,
 }
 
 const ErrorMessages = {
@@ -55,7 +51,6 @@ const ErrorMessages = {
 
 type ApiRequestFunctionType = (arg: any) => Promise<*>;
 
-const DATE_TIME_FORMAT: string = 'h:mma ddd';
 const MOMENT_DATE_TIME_FORMAT: string = 'YYYY-MM-DD HH:mm:ss';
 
 /**
@@ -77,7 +72,6 @@ class WeatherInfoComponent extends
       error: '',
       currentWeatherData: {},
       forecastData: {},
-      averageTemp: 0,
     }
   }
 
@@ -98,14 +92,13 @@ class WeatherInfoComponent extends
     });
 
     forecastData = this.adjustDataForTimezone(city, forecastData);
-
-    const averageTemp = WeatherInfoComponent.findTempAverage(forecastData);
+    let sortedForecastData = this.sortByDay(forecastData);
 
     this.setState({
       currentWeatherData,
       forecastData,
+      sortedForecastData,
       isFetching: false,
-      averageTemp,
     });
   }
 
@@ -130,6 +123,32 @@ class WeatherInfoComponent extends
       entry.dt_txt = moment(entry.dt*1000).format(MOMENT_DATE_TIME_FORMAT);
     });
     return forecastData;
+  }
+
+  /**
+   * Sort forecast data into a map of days
+   * @param forecastData Forecast data
+   */
+  sortByDay(forecastData: any): Object {
+    const fiveDayForecast = {};
+
+    forecastData.list.forEach(entry =>{
+      const day = moment(entry.dt * 1000).format('DD');
+      if (!fiveDayForecast[day]) {
+        fiveDayForecast[day] = {
+          data: [],
+          maxTemp: -Number.MAX_VALUE,
+          minTemp: Number.MAX_VALUE,
+        };
+      }
+
+      const dayForecast = fiveDayForecast[day];
+      dayForecast.data.push(entry);
+      dayForecast.maxTemp = Math.max(dayForecast.maxTemp, convertKelvinToCelsius(entry.main.temp));
+      dayForecast.minTemp = Math.min(dayForecast.minTemp, convertKelvinToCelsius(entry.main.temp));
+    });
+
+    return fiveDayForecast;
   }
 
   /**
@@ -166,54 +185,7 @@ class WeatherInfoComponent extends
     }
   }
 
-  /**
-   * Generate temperature data from 5-day forecast data for LineChart
-   * @param forecastData 5-day forecast data
-   * @returns {Array} Array of xy (time, temp) data for LineChart
-   */
-  generateTempData(forecastData: any): any {
-    let arr = [];
 
-    if (forecastData && forecastData.list && forecastData.list.length > 0) {
-      return this.generateChartData(forecastData, 'temp');
-    }
-
-    return arr;
-  }
-
-  /**
-   * Helper function to generate chart temperature data
-   * @param forecastData 5-day forecast data
-   * @param tempPropertyName Forecast data temperature property name to extract
-   * @returns {Array} Array of chart compatible data
-   */
-  generateChartData(forecastData: any, tempPropertyName: string) {
-    let tempData = [];
-
-    forecastData.list.forEach(day => {
-      tempData.push({
-        x: moment(day.dt*1000).format(DATE_TIME_FORMAT),
-        temp: convertKelvinToCelsius(day.main[tempPropertyName]).toFixed(0),
-      })
-    });
-
-    return tempData;
-  }
-
-  /**
-   * Find the average temperature from a 5-day forecast
-   * @param forecastData 5-day forecast data
-   * @returns {number} Average temperature over the 5 days of data
-   */
-  static findTempAverage(forecastData: any): number {
-    if (forecastData && forecastData.list && forecastData.list.length > 0) {
-      return forecastData.list.reduce((sum, day) => {
-        return sum + convertKelvinToCelsius(day.main.temp);
-      }, 0) / forecastData.list.length;
-    }
-
-    return 1;
-  }
 
   /**
    * Render this React component.
@@ -232,12 +204,6 @@ class WeatherInfoComponent extends
       );
     }
 
-    let tempColorName = 'midnightblue';
-
-    if (this.state.averageTemp > 0) {
-      tempColorName = 'darkgoldenrod'
-    }
-
     return (
       <div className="weatherContainer">
         <div className="weatherPane">
@@ -245,25 +211,9 @@ class WeatherInfoComponent extends
             currentWeatherData={this.state.currentWeatherData}
           />
         </div>
-        <div className="tempChart">
-          <LineChart
-            width={700}
-            height={200}
-            data={this.generateTempData(this.state.forecastData)}
-          >
-            <XAxis
-              dataKey="x"
-              domain={['auto', 'auto']}
-              name="Time"
-            />
-            <CartesianGrid strokeDasharray="3 3"/>
-            <YAxis />
-            <Tooltip/>
-            <Line type="monotone" dataKey="temp" stroke={tempColorName} activeDot={{r: 8}}/>
-          </LineChart>
-        </div>
         <div className="forecastPane">
           <Forecast
+            sortedForecastData={this.state.sortedForecastData}
             forecastData={this.state.forecastData}
           />
         </div>

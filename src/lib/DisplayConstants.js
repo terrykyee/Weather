@@ -33,6 +33,6 @@ export const MatchDisplayConstants = {
 };
 
 export const WeatherInfoDisplayConstants = {
-  TEMP_RANGE: 'Temperature Range',
-  TEMP_RANGE_OFF: 'Temperature Range Off',
+  SHOW_WEEK: 'Show Entire Week',
+  SHOW_WEEK_OFF: 'Show Entire Week Off',
 };

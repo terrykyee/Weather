@@ -1,6 +1,37 @@
+.forecast {
+  display: flex;
+  flex-flow: column;
+  align-items: stretch;
+  margin: 0 auto;
+  width: auto;
+  height: 100%;
+  min-height: 100%;
+}
+
 .daily {
   display: flex;
   flex-direction: row;
   margin: 0 auto;
   width: 700px;
 }
+
+.chartPane {
+  display: flex;
+  flex-direction: row;
+  margin: 0 auto;
+  width: 700px;
+}
+
+.showButton {
+  flex-grow: 1;
+  font-weight: bold;
+  color: white;
+  border: none;
+  background: royalblue;
+  font-size: 15px;
+  height: 25px;
+  margin: 0 auto;
+  margin-bottom: 5px;
+  width: auto;
+}
+
