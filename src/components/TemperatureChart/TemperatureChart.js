@@ -92,10 +92,15 @@ class TemperatureChartComponent extends
           dataKey="x"
           domain={['auto', 'auto']}
           name="Time"
+          fontFamily="sans-serif"
+          fontSize="12px"
         />
         <CartesianGrid strokeDasharray="3 3"/>
-        <YAxis />
-        <Tooltip/>
+        <YAxis
+          fontFamily="sans-serif"
+          fontSize="12px"
+        />
+        <Tooltip wrapperStyle={{ fontFamily: 'Open Sans, sans-serif', fontSize: '12px', backgroundColor: '#ccc' }} />
         <Line type="monotone" dataKey="temp" stroke={tempColorName} activeDot={{r: 8}}/>
       </LineChart>
     );
