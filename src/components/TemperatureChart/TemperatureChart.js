@@ -6,13 +6,14 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
 import {
-  LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip
+  LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ReferenceArea
 } from 'recharts';
 import './TemperatureChart.css';
 
 // Flow type definitions for injected props
 type TemperatureChartInjectedPropsType = {
   data: Array<any>,
+  daySections: ?Array<any>,
 }
 
 // Flow type definitions for connected props
@@ -39,6 +40,7 @@ class TemperatureChartComponent extends
   React.PureComponent<TemperatureChartPropsType, TemperatureChartStateType> {
   static propTypes = {
     data: PropTypes.arrayOf(PropTypes.object).isRequired,
+    daySections: PropTypes.arrayOf(PropTypes.object),
   };
 
   static defaultProps = {};
@@ -72,6 +74,21 @@ class TemperatureChartComponent extends
   }
 
   /**
+   * Generate shaded reference areas in the chart highlighting day sections
+   * @param daySections Day section data
+   * @returns {*}
+   */
+  generateDaySections(daySections: any): React.Node {
+    if (daySections) {
+      return daySections.map( section => (
+          <ReferenceArea x1={section.x1} x2={section.x2} />
+      ));
+    }
+
+    return null;
+  }
+
+  /**
    * Render this React component.
    * @returns {XML}
    */
@@ -88,6 +105,7 @@ class TemperatureChartComponent extends
         height={200}
         data={this.props.data}
       >
+        {this.generateDaySections(this.props.daySections)}
         <XAxis
           dataKey="x"
           domain={['auto', 'auto']}
