@@ -127,7 +127,7 @@ class ForecastComponent extends
 
     forecastDataArray.forEach(day => {
       tempData.push({
-        x: day.dt*1000,
+        x: day.dt,
         temp: convertKelvinToCelsius(day.main[tempPropertyName]).toFixed(0),
       })
     });
@@ -147,9 +147,9 @@ class ForecastComponent extends
     for (let i = 0; i < days.length; i++) {
       if (i % 2 === 0) {
         daySections.push({
-          x1: moment(sortedForecast[days[i]].data[0].dt*1000).format(DATE_TIME_FORMAT),
-          x2: i+1 < days.length ? moment(sortedForecast[days[i+1]].data[0].dt*1000).format(DATE_TIME_FORMAT) :
-            moment(sortedForecast[days[i+1]].data[sortedForecast[days[i+1]].data.length - 1].dt*1000).format(DATE_TIME_FORMAT),
+          x1: moment(sortedForecast[days[i]].data[0].dt).format(DATE_TIME_FORMAT),
+          x2: i+1 < days.length ? moment(sortedForecast[days[i+1]].data[0].dt).format(DATE_TIME_FORMAT) :
+            moment(sortedForecast[days[i+1]].data[sortedForecast[days[i+1]].data.length - 1].dt).format(DATE_TIME_FORMAT),
         })
       }
     }
@@ -175,7 +175,7 @@ class ForecastComponent extends
         <React.Fragment key={dayForecast.dt}>
           <DayWeather
             weatherData={dayForecast}
-            selected={moment(dayForecast.dt*1000).format('DD') === this.state.selectedDay}
+            selected={moment(dayForecast.dt).format('DD') === this.state.selectedDay}
             clickHandler={this.OnDayClicked}
           />
         </React.Fragment>

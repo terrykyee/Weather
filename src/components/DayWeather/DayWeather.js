@@ -64,7 +64,7 @@ class DayWeatherComponent extends
   }
 
   OnClickHandler = (event: SyntheticMouseEvent<*>) => {
-    this.props.clickHandler(moment(this.props.weatherData.dt * 1000).format('DD'));
+    this.props.clickHandler(moment(this.props.weatherData.dt).format('DD'));
   };
 
   /**
@@ -79,7 +79,7 @@ class DayWeatherComponent extends
           onClick={this.OnClickHandler}
         >
           <div className="day">
-            {moment(this.props.weatherData.dt*1000).format('ddd')}
+            {moment(this.props.weatherData.dt).format('ddd')}
           </div>
           <center><img src={`${ICON_URL}${this.props.weatherData.weather[0].icon}.png`} alt='Profile Icon'
                        className='profileIcon'/></center>

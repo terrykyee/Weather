@@ -120,7 +120,8 @@ class WeatherInfoComponent extends
     }
 
     forecastData.list.forEach(entry => {
-      entry.dt_txt = moment(entry.dt*1000).format(MOMENT_DATE_TIME_FORMAT);
+      entry.dt = entry.dt*1000;
+      entry.dt_txt = moment(entry.dt).format(MOMENT_DATE_TIME_FORMAT);
     });
     return forecastData;
   }
@@ -133,7 +134,7 @@ class WeatherInfoComponent extends
     const fiveDayForecast = {};
 
     forecastData.list.forEach(entry =>{
-      const day = moment(entry.dt * 1000).format('DD');
+      const day = moment(entry.dt).format('DD');
       if (!fiveDayForecast[day]) {
         fiveDayForecast[day] = {
           data: [],
