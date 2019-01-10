@@ -10,7 +10,7 @@ import './Forecast.css';
 import DayWeather from '../DayWeather/DayWeather';
 import TemperatureChart from '../TemperatureChart/TemperatureChart';
 import { convertKelvinToCelsius } from '../../lib/UnitUtilities';
-import { WeatherInfoDisplayConstants } from '../../lib/DisplayConstants';
+import { ForecastDisplayConstants } from '../../lib/DisplayConstants';
 
 // Flow type definitions for injected props
 type ForecastInjectedPropsType = {
@@ -199,7 +199,7 @@ class ForecastComponent extends
           onClick={this.showWeekHandler}
           disabled={!this.userDataValid(this.props, this.state)}
         >
-          {WeatherInfoDisplayConstants.SHOW_WEEK}
+          {ForecastDisplayConstants.SHOW_WEEK}
         </button>
         <div className="daily">
           {dailyWeather}
