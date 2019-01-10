@@ -37,8 +37,6 @@ type ForecastStateType = {
   showWeek: boolean,
 }
 
-const DATE_TIME_FORMAT: string = 'h:mma ddd';
-
 /**
  * Forecast React Component class
  */
@@ -135,28 +133,6 @@ class ForecastComponent extends
     return tempData;
   }
 
-  /**
-   * Helper function to generate day sections for the temperature chart
-   * @param sortedForecast day sorted forecast data
-   * @returns {Array} Array of day boundaries for the week
-   */
-  generateDaySections(sortedForecast: any): Array<Object> {
-    let daySections = [];
-    let days = Object.keys(sortedForecast).sort();
-
-    for (let i = 0; i < days.length; i++) {
-      if (i % 2 === 0) {
-        daySections.push({
-          x1: moment(sortedForecast[days[i]].data[0].dt).format(DATE_TIME_FORMAT),
-          x2: i+1 < days.length ? moment(sortedForecast[days[i+1]].data[0].dt).format(DATE_TIME_FORMAT) :
-            moment(sortedForecast[days[i+1]].data[sortedForecast[days[i+1]].data.length - 1].dt).format(DATE_TIME_FORMAT),
-        })
-      }
-    }
-
-    return daySections;
-  }
-
   OnDayClicked = (day: string) => {
       this.setState({
         selectedDay: day,
@@ -216,7 +192,6 @@ class ForecastComponent extends
         <div className="chartPane">
           <TemperatureChart
             data={this.generateTempData(this.state.showWeek ? this.props.forecastData.list : this.props.sortedForecastData[this.state.selectedDay].data)}
-            daySections={this.state.showWeek ? this.generateDaySections(this.props.sortedForecastData) : null}
           />
         </div>
         <button

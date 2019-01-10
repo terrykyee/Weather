@@ -14,7 +14,6 @@ import './TemperatureChart.css';
 // Flow type definitions for injected props
 type TemperatureChartInjectedPropsType = {
   data: Array<any>,
-  daySections: ?Array<any>,
 }
 
 // Flow type definitions for connected props
@@ -43,7 +42,6 @@ class TemperatureChartComponent extends
   React.PureComponent<TemperatureChartPropsType, TemperatureChartStateType> {
   static propTypes = {
     data: PropTypes.arrayOf(PropTypes.object).isRequired,
-    daySections: PropTypes.arrayOf(PropTypes.object),
   };
 
   static defaultProps = {};
@@ -80,13 +78,34 @@ class TemperatureChartComponent extends
 
   /**
    * Generate shaded reference areas in the chart highlighting day sections
-   * @param daySections Day section data
+   * @param data chart data
    * @returns {*}
    */
-  generateDaySections(daySections: any): React.Node {
-    if (daySections) {
+  generateDaySections(data: any): React.Node {
+    if (data) {
+      let daySections = [];
+      let day = (moment(data[0]).endOf('day').unix() + 1) * 1000;
+
+      daySections.push({
+        x1: data[0].x,
+        x2: day,
+      });
+
+      day = moment(day).add(1, 'days').unix() * 1000;
+
+      while (day < data[data.length - 1].x) {
+        daySections.push({
+          x1: day,
+          x2: (moment(day).endOf('day').unix() + 1) * 1000,
+        });
+        day = moment(day).add(2, 'days').unix() * 1000;
+      }
+
+      console.log('daySections');
+      console.log(daySections);
+
       return daySections.map( section => (
-          <ReferenceArea x1={section.x1} x2={section.x2} />
+          <ReferenceArea key={section.x1} x1={section.x1} x2={section.x2} />
       ));
     }
 
@@ -110,7 +129,7 @@ class TemperatureChartComponent extends
         height={200}
         data={this.props.data}
       >
-        {this.generateDaySections(this.props.daySections)}
+        {this.generateDaySections(this.props.data)}
         <XAxis
           dataKey="x"
           domain={['auto', 'auto']}
