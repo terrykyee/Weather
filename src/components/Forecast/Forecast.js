@@ -78,7 +78,7 @@ class ForecastComponent extends
 
     // find the closest entry to noon for the day
     // also rewrite min/max temps with proper high low temps
-    Object.keys(sortedForecast).forEach(key => {
+    Object.keys(sortedForecast).sort().forEach(key => {
       const day = sortedForecast[key];
       let minHoursFromNoon = Number.MAX_VALUE;
       let foundIndex = 0;
@@ -122,7 +122,7 @@ class ForecastComponent extends
    * @param tempPropertyName Forecast data temperature property name to extract
    * @returns {Array} Array of chart compatible data
    */
-  generateChartData(forecastDataArray: any, tempPropertyName: string) {
+  generateChartData(forecastDataArray: any, tempPropertyName: string): any {
     let tempData = [];
 
     forecastDataArray.forEach(day => {
@@ -133,6 +133,28 @@ class ForecastComponent extends
     });
 
     return tempData;
+  }
+
+  /**
+   * Helper function to generate day sections for the temperature chart
+   * @param sortedForecast day sorted forecast data
+   * @returns {Array} Array of day boundaries for the week
+   */
+  generateDaySections(sortedForecast: any): Array<Object> {
+    let daySections = [];
+    let days = Object.keys(sortedForecast).sort();
+
+    for (let i = 0; i < days.length; i++) {
+      if (i % 2 === 0) {
+        daySections.push({
+          x1: moment(sortedForecast[days[i]].data[0].dt*1000).format(DATE_TIME_FORMAT),
+          x2: i+1 < days.length ? moment(sortedForecast[days[i+1]].data[0].dt*1000).format(DATE_TIME_FORMAT) :
+            moment(sortedForecast[days[i+1]].data[sortedForecast[days[i+1]].data.length - 1].dt*1000).format(DATE_TIME_FORMAT),
+        })
+      }
+    }
+
+    return daySections;
   }
 
   OnDayClicked = (day: string) => {
@@ -192,7 +214,10 @@ class ForecastComponent extends
     return (
       <div className="forecast">
         <div className="chartPane">
-          <TemperatureChart data={this.generateTempData(this.state.showWeek ? this.props.forecastData.list : this.props.sortedForecastData[this.state.selectedDay].data)} />
+          <TemperatureChart
+            data={this.generateTempData(this.state.showWeek ? this.props.forecastData.list : this.props.sortedForecastData[this.state.selectedDay].data)}
+            daySections={this.state.showWeek ? this.generateDaySections(this.props.sortedForecastData) : null}
+          />
         </div>
         <button
           className="showButton"
