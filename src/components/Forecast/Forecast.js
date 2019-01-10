@@ -62,6 +62,7 @@ class ForecastComponent extends
   props: ForecastPropsType;
 
   async componentDidMount() {
+    conole.log('Forecast data');
     console.log(this.props.sortedForecastData);
     console.log(this.props.forecastData);
   }

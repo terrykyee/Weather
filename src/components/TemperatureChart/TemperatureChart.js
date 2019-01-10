@@ -57,8 +57,6 @@ class TemperatureChartComponent extends
   props: TemperatureChartPropsType;
 
   async componentDidMount() {
-    console.log('chart data');
-    console.log(this.props.data);
   }
 
   /**
