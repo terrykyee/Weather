@@ -127,7 +127,7 @@ class ForecastComponent extends
 
     forecastDataArray.forEach(day => {
       tempData.push({
-        x: moment(day.dt*1000).format(DATE_TIME_FORMAT),
+        x: day.dt*1000,
         temp: convertKelvinToCelsius(day.main[tempPropertyName]).toFixed(0),
       })
     });

@@ -5,6 +5,7 @@
  */
 import * as React from 'react';
 import PropTypes from 'prop-types';
+import moment from 'moment-timezone';
 import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ReferenceArea
 } from 'recharts';
@@ -33,6 +34,8 @@ type TemperatureChartPropsType = TemperatureChartInjectedPropsType &
 type TemperatureChartStateType = {
 }
 
+const DATE_TIME_FORMAT: string = 'h:mma ddd';
+
 /**
  * Temperature Chart React Component class
  */
@@ -56,6 +59,8 @@ class TemperatureChartComponent extends
   props: TemperatureChartPropsType;
 
   async componentDidMount() {
+    console.log('chart data');
+    console.log(this.props.data);
   }
 
   /**
@@ -112,13 +117,19 @@ class TemperatureChartComponent extends
           name="Time"
           fontFamily="sans-serif"
           fontSize="12px"
+          type="number"
+          scale="time"
+          tickFormatter = {(unixTime) => moment(unixTime).format(DATE_TIME_FORMAT)}
         />
         <CartesianGrid strokeDasharray="3 3"/>
         <YAxis
           fontFamily="sans-serif"
           fontSize="12px"
         />
-        <Tooltip wrapperStyle={{ fontFamily: 'Open Sans, sans-serif', fontSize: '12px', backgroundColor: '#ccc' }} />
+        <Tooltip
+          wrapperStyle={{ fontFamily: 'Open Sans, sans-serif', fontSize: '12px', backgroundColor: '#ccc' }}
+          labelFormatter = {(unixTime) => moment(unixTime).format(DATE_TIME_FORMAT)}
+        />
         <Line type="monotone" dataKey="temp" stroke={tempColorName} activeDot={{r: 8}}/>
       </LineChart>
     );
